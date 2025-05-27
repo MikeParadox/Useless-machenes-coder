@@ -1,10 +1,22 @@
 # frozen_string_literal: true
 
 class Regpretor
+
+  def run(filepath,*regs)
+    rb = File.open(filepath, "a") do |file|
+      regs.each_with_index do |reg,i|
+        puts reg
+        file.puts "$x[#{i+1}] = #{regs[i].first}"
+      end
+      file.puts "puts l1"
+    end
+    output = `ruby #{filepath}`
+    puts "Output from #{filepath}:\n#{output}"
+  end
   def interpret(filepath)
     lines = File.readlines(filepath)
-
-    rb = File.open("regmach.rb", "w")
+    name = File.basename(filepath, ".*")
+    rb = File.open("#{name}.rb", "w")
     max_reg = countRegs(lines)
     rb.write("$x = Array.new(#{max_reg},0)")
     lines.each do |line|
@@ -14,10 +26,9 @@ class Regpretor
     end
 
 
-    rb.write("puts l1")
+    #rb.write("puts l1")
     rb.close
-    output = `ruby regmach.rb`
-    puts "Output from regmach.rb:\n#{output}"
+    File.basename(rb)
   end
 
   def countRegs(lines)
@@ -69,3 +80,4 @@ class Regpretor
 end
 
 Regpretor.new.interpret("test.txt")
+Regpretor.new.run("test.rb",[0])
